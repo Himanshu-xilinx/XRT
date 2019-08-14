@@ -170,6 +170,10 @@ int zocl_pwrite_bo_ioctl(struct drm_device *dev, void *data,
 		struct drm_file *filp);
 int zocl_pread_bo_ioctl(struct drm_device *dev, void *data,
 		struct drm_file *filp);
+int zocl_pread_unmgd_ioctl(struct drm_device *dev, void *data,
+		struct drm_file *filp);
+int zocl_pwrite_unmgd_ioctl(struct drm_device *dev, void *data,
+		struct drm_file *filp);
 int zocl_execbuf_ioctl(struct drm_device *dev, void *data,
 		struct drm_file *filp);
 int zocl_read_axlf_ioctl(struct drm_device *dev, void *data,

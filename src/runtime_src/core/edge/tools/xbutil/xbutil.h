@@ -32,6 +32,7 @@
 //#include "core/common/dd.h"
 #include "core/common/utils.h"
 #include "core/common/sensor.h"
+#include "core/edge/common/memaccess.h"
 #include "core/edge/include/zynq_ioctl.h"
 #include "xclbin.h"
 #include <version.h>
@@ -524,13 +525,50 @@ public:
         return 0;
     }
 
+    int memread(std::string aFilename, unsigned long long aStartAddr = 0, unsigned long long aSize = 0) {
+        std::ios_base::fmtflags f(std::cout.flags());
+        if (strstr(m_devinfo.mName, "-xare")) {//This is ARE device
+          if (aStartAddr > m_devinfo.mDDRSize) {
+              std::cout << "Start address " << std::hex << aStartAddr <<
+                           " is over ARE" << std::endl;
+          }
+          if (aSize > m_devinfo.mDDRSize || aStartAddr+aSize > m_devinfo.mDDRSize) {
+              std::cout << "Read size " << std::dec << aSize << " from address 0x" << std::hex << aStartAddr <<
+                           " is over ARE" << std::endl;
+          }
+        }
+        std::cout.flags(f);
+        printf("%s:%d mDDRSize:%x mDataAlignment:%d\n",__func__,__LINE__,m_devinfo.mDDRSize,m_devinfo.mDataAlignment);
+        return memaccess(m_handle, m_devinfo.mDDRSize, m_devinfo.mDataAlignment
+            ).read(
+            aFilename, aStartAddr, aSize);
+    }
+
+    int memwrite(unsigned long long aStartAddr, unsigned long long aSize, unsigned int aPattern = 'J') {
+        std::ios_base::fmtflags f(std::cout.flags());
+        if (strstr(m_devinfo.mName, "-xare")) {//This is ARE device
+            if (aStartAddr > m_devinfo.mDDRSize) {
+                std::cout << "Start address " << std::hex << aStartAddr <<
+                             " is over ARE" << std::endl;
+            }
+            if (aSize > m_devinfo.mDDRSize || aStartAddr+aSize > m_devinfo.mDDRSize) {
+                std::cout << "Write size " << std::dec << aSize << " from address 0x" << std::hex << aStartAddr <<
+                             " is over ARE" << std::endl;
+            }
+        }
+        std::cout.flags(f);
+        return memaccess(m_handle, m_devinfo.mDDRSize, m_devinfo.mDataAlignment
+            ).write(
+            aStartAddr, aSize, aPattern);
+    }
+
     int program(const std::string& xclbin, unsigned region) { std::cout << "Unsupported API " << std::endl; return -1; }
     int boot() { std::cout << "Unsupported API " << std::endl; return -1; }
     int fan(unsigned speed) { std::cout << "Unsupported API " << std::endl; return -1; }
     int run(unsigned region, unsigned cu) { std::cout << "Unsupported API " << std::endl; return -1; }
     int dmatest(size_t blockSize, bool verbose) { std::cout << "Unsupported API " << std::endl; return -1; }
-    int memread(std::string aFilename, unsigned long long aStartAddr = 0, unsigned long long aSize = 0) { std::cout << "Unsupported API " << std::endl; return -1; }
-    int memwrite(unsigned long long aStartAddr, unsigned long long aSize, unsigned int aPattern = 'J') { std::cout << "Unsupported API " << std::endl; return -1; }
+    //int memread(std::string aFilename, unsigned long long aStartAddr = 0, unsigned long long aSize = 0) { std::cout << "Unsupported API " << std::endl; return -1; }
+    //int memwrite(unsigned long long aStartAddr, unsigned long long aSize, unsigned int aPattern = 'J') { std::cout << "Unsupported API " << std::endl; return -1; }
     //int do_dd(dd::ddArgs_t args ) { std::cout << "Unsupported API " << std::endl; return -1; }
     int validate(bool quick) { std::cout << "Unsupported API " << std::endl; return -1; }
     int reset(xclResetKind kind) { std::cout << "Unsupported API " << std::endl; return -1; }

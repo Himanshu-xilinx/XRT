@@ -254,6 +254,28 @@ size_t ZYNQShim::xclRead(xclAddressSpace space, uint64_t offset, void *hostBuf, 
   return size;
 }
 
+ssize_t ZYNQShim::xclUnmgdPread(unsigned flags, void *buf, size_t count, uint64_t offset)
+{
+    if (flags) {
+        return -EINVAL;
+    }
+    drm_zocl_pread_bo preadInfo = { 0, 0, offset, count, reinterpret_cast<uint64_t>(buf) };
+    return ioctl(mKernelFD, DRM_IOCTL_ZOCL_PREAD_UNMGD, &preadInfo);
+    //void *ptr = mmap(0, count, (write ?(PROT_READ|PROT_WRITE) : PROT_READ ),
+    //      MAP_SHARED, mKernelFD, offset+0x100000000);
+    //printf("HIMANSHU :%s:%d ptr:%x offset:%x\n", __func__,__LINE__,ptr, offset);
+    //return 0;
+}
+
+ssize_t ZYNQShim::xclUnmgdPwrite(unsigned flags, const void *buf, size_t count, uint64_t offset)
+{
+    if (flags) {
+        return -EINVAL;
+    }
+    drm_zocl_pwrite_bo unmgd = {0, 0, offset, count, reinterpret_cast<uint64_t>(buf)};
+    return ioctl(mKernelFD, DRM_IOCTL_ZOCL_PWRITE_UNMGD, &unmgd);
+}
+
 unsigned int ZYNQShim::xclAllocBO(size_t size, int unused, unsigned flags) {
   // TODO: unify xocl and zocl flags.
   //drm_zocl_create_bo info = { size, 0xffffffff, DRM_ZOCL_BO_FLAGS_COHERENT | DRM_ZOCL_BO_FLAGS_CMA };
@@ -1219,12 +1241,14 @@ int xclRemoveAndScanFPGA()
 ssize_t xclUnmgdPread(xclDeviceHandle handle, unsigned flags, void *buf,
                       size_t size, uint64_t offset)
 {
-  return -ENOSYS;
+  ZYNQ::ZYNQShim *drv = ZYNQ::ZYNQShim::handleCheck(handle);
+  return drv ? drv->xclUnmgdPread(flags, buf, size, offset) : -ENODEV;
 }
 ssize_t xclUnmgdPwrite(xclDeviceHandle handle, unsigned flags, const void *buf,
                        size_t size, uint64_t offset)
 {
-  return 0;
+  ZYNQ::ZYNQShim *drv = ZYNQ::ZYNQShim::handleCheck(handle);
+  return drv ? drv->xclUnmgdPwrite(flags, buf, size, offset) : -ENODEV;
 }
 int xclRegisterInterruptNotify(xclDeviceHandle handle, unsigned int userInterrupt, int fd)
 {

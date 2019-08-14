@@ -58,6 +58,8 @@ public:
   // Restricted read/write on IP register space
   int xclRegWrite(uint32_t cu_index, uint32_t offset, uint32_t data);
   int xclRegRead(uint32_t cu_index, uint32_t offset, uint32_t *datap);
+  ssize_t xclUnmgdPread(unsigned flags, void *buf, size_t count, uint64_t offset);
+  ssize_t xclUnmgdPwrite(unsigned flags, const void *buf, size_t count, uint64_t offset);
 
   unsigned int xclAllocBO(size_t size, int unused, unsigned flags);
   unsigned int xclAllocUserPtrBO(void *userptr, size_t size, unsigned flags);

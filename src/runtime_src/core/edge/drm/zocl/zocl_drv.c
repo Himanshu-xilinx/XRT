@@ -307,6 +307,7 @@ zocl_gem_mmap(struct file *filp, struct vm_area_struct *vma)
 		rc = dma_mmap_wc(cma_obj->base.dev->dev, vma, cma_obj->vaddr,
 		    paddr, vma->vm_end - vma->vm_start);
 	}
+		DRM_ERROR("HIMANSHU %s:%d paddr:%x vddr:%x\n",__func__,__LINE__,paddr,vma->vm_start);
 
 	if (rc)
 		drm_gem_vm_close(vma);
@@ -505,6 +506,10 @@ static const struct drm_ioctl_desc zocl_ioctls[] = {
 	DRM_IOCTL_DEF_DRV(ZOCL_INFO_BO, zocl_info_bo_ioctl,
 			DRM_AUTH|DRM_UNLOCKED|DRM_RENDER_ALLOW),
 	DRM_IOCTL_DEF_DRV(ZOCL_PWRITE_BO, zocl_pwrite_bo_ioctl,
+			DRM_AUTH|DRM_UNLOCKED|DRM_RENDER_ALLOW),
+	DRM_IOCTL_DEF_DRV(ZOCL_PREAD_UNMGD, zocl_pread_unmgd_ioctl,
+			DRM_AUTH|DRM_UNLOCKED|DRM_RENDER_ALLOW),
+	DRM_IOCTL_DEF_DRV(ZOCL_PWRITE_UNMGD, zocl_pwrite_unmgd_ioctl,
 			DRM_AUTH|DRM_UNLOCKED|DRM_RENDER_ALLOW),
 	DRM_IOCTL_DEF_DRV(ZOCL_PREAD_BO, zocl_pread_bo_ioctl,
 			DRM_AUTH|DRM_UNLOCKED|DRM_RENDER_ALLOW),

@@ -36,6 +36,8 @@ enum {
 	DRM_ZOCL_INFO_BO,
 	DRM_ZOCL_PWRITE_BO,
 	DRM_ZOCL_PREAD_BO,
+	DRM_ZOCL_PREAD_UNMGD,
+	DRM_ZOCL_PWRITE_UNMGD,
 	DRM_ZOCL_PCAP_DOWNLOAD,
 	DRM_ZOCL_EXECBUF,
 	DRM_ZOCL_READ_AXLF,
@@ -246,8 +248,13 @@ struct drm_zocl_sk_report {
 #define DRM_IOCTL_ZOCL_PWRITE_BO       DRM_IOWR(DRM_COMMAND_BASE +  \
                                        DRM_ZOCL_PWRITE_BO, \
                                        struct drm_zocl_pwrite_bo)
+#define DRM_IOCTL_ZOCL_PWRITE_UNMGD    DRM_IOWR(DRM_COMMAND_BASE +  \
+                                       DRM_ZOCL_PWRITE_UNMGD, \
+                                       struct drm_zocl_pwrite_bo)
 #define DRM_IOCTL_ZOCL_PREAD_BO        DRM_IOWR(DRM_COMMAND_BASE +      \
                                        DRM_ZOCL_PREAD_BO, struct drm_zocl_pread_bo)
+#define DRM_IOCTL_ZOCL_PREAD_UNMGD     DRM_IOWR(DRM_COMMAND_BASE +      \
+                                       DRM_ZOCL_PREAD_UNMGD, struct drm_zocl_pread_bo)
 #define DRM_IOCTL_ZOCL_PCAP_DOWNLOAD   DRM_IOWR(DRM_COMMAND_BASE +      \
                                        DRM_ZOCL_PCAP_DOWNLOAD, struct drm_zocl_pcap_download)
 #define DRM_IOCTL_ZOCL_EXECBUF         DRM_IOWR(DRM_COMMAND_BASE + \

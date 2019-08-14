@@ -656,6 +656,60 @@ int zocl_info_bo_ioctl(struct drm_device *dev,
 	return 0;
 }
 
+int zocl_pread_unmgd_ioctl(struct drm_device *dev, void *data,
+		struct drm_file *filp)
+{
+	const struct drm_zocl_pread_bo *args = data;
+	char __user *user_data = to_user_ptr(args->data_ptr);
+    int ret;
+    void* ptr = ioremap(args->offset, args->size);
+    DRM_ERROR("HIMANSHU %s:%d ptr:%x off:%x size:%x\n",__func__,__LINE__,ptr,args->offset,args->size);
+
+    if (!ZOCL_ACCESS_OK(VERIFY_WRITE, user_data, args->size)) {
+        ret = EFAULT;
+        DRM_ERROR("HIMANSHU %s:%d ptr:%x off:%x size:%x ZOCL_ACCESS_OK\n",__func__,__LINE__,ptr,args->offset,args->size);
+        return ret;
+    }
+
+    if(ptr) {
+        char* a = (char*) ptr;
+        DRM_ERROR("HIMANSHU %s:%d ptr0:%x ptr1:%x ptr2:%x ptr3:%x ptr4:%x ptr5:%x ptr6:%x ptr7:%x ptr8:%x ptr9:%x ptr10:%x ptr11:%x \n",__func__,__LINE__,a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9],a[10],a[11]);
+        ret = copy_to_user(user_data, ptr, args->size);
+        DRM_ERROR("HIMANSHU %s:%d RET:%d  ptr0:%x ptr1:%x ptr2:%x ptr3:%x ptr4:%x ptr5:%x ptr6:%x ptr7:%x ptr8:%x ptr9:%x ptr10:%x ptr11:%x \n",__func__,__LINE__,ret,a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9],a[10],a[11]);
+        iounmap(ptr);
+        return ret;
+    }
+    return -EFAULT;
+}
+
+int zocl_pwrite_unmgd_ioctl(struct drm_device *dev, void *data,
+        struct drm_file *filp)
+{
+    const struct drm_zocl_pwrite_bo *args = data;
+    char __user *user_data = to_user_ptr(args->data_ptr);
+    int ret;
+    void* ptr = ioremap(args->offset, args->size);
+    DRM_ERROR("HIMANSHU %s:%d ptr:%x off:%x size:%x\n",__func__,__LINE__,ptr,args->offset,args->size);
+
+    if (!ZOCL_ACCESS_OK(VERIFY_READ, user_data, args->size)) {
+        ret = -EFAULT;
+        DRM_ERROR("HIMANSHU %s:%d ptr:%x off:%x size:%x ZOCL_ACCESS_OK\n",__func__,__LINE__,ptr,args->offset,args->size);
+        return ret;
+    }
+
+    if(ptr) {
+        char* a = (char*) ptr;
+        DRM_ERROR("HIMANSHU %s:%d user ptr0:%x ptr1:%x ptr2:%x ptr3:%x ptr4:%x ptr5:%x ptr6:%x ptr7:%x ptr8:%x ptr9:%x ptr10:%x ptr11:%x \n",__func__,__LINE__,user_data[0],user_data[1],user_data[2],user_data[3],user_data[4],user_data[5],user_data[6],user_data[7],user_data[8],user_data[9],user_data[10],user_data[11]);
+        DRM_ERROR("HIMANSHU %s:%d ptr0:%x ptr1:%x ptr2:%x ptr3:%x ptr4:%x ptr5:%x ptr6:%x ptr7:%x ptr8:%x ptr9:%x ptr10:%x ptr11:%x \n",__func__,__LINE__,a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9],a[10],a[11]);
+        ret = copy_from_user(ptr, user_data, args->size);
+        DRM_ERROR("HIMANSHU %s:%d RET:%d  ptr0:%x ptr1:%x ptr2:%x ptr3:%x ptr4:%x ptr5:%x ptr6:%x ptr7:%x ptr8:%x ptr9:%x ptr10:%x ptr11:%x \n",__func__,__LINE__,ret,a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9],a[10],a[11]);
+        iounmap(ptr);
+        return ret;
+    }
+    return -EFAULT;
+}
+
+
 int zocl_pwrite_bo_ioctl(struct drm_device *dev, void *data,
 		struct drm_file *filp)
 {
