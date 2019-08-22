@@ -27,6 +27,19 @@ add_library(oclxdp SHARED ${OPENCL_SRC}
   )
 add_dependencies(oclxdp xdp xilinxopencl)
 
+
+if (${XRT_NATIVE_BUILD} STREQUAL "no")
+  set(ALLOCATOR_SRC "")
+  add_subdirectory(xallocator)
+  add_library(xallocator SHARED ${ALLOCATOR_SRC}
+    $<TARGET_OBJECTS:xallocatorobj>
+  )
+  set_target_properties(xallocator PROPERTIES VERSION ${XRT_VERSION_STRING}
+  SOVERSION ${XRT_SOVERSION})
+
+  install (TARGETS xallocator LIBRARY DESTINATION ${XRT_INSTALL_DIR}/lib)
+endif()
+
 option(XOCL_VERBOSE "Enable xocl verbosity" OFF)
 option(XRT_VERBOSE "Enable xrt verbosity" OFF)
 

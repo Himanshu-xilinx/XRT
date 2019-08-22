@@ -43,6 +43,9 @@ TEMPLATE=zynqMP
 #	echo '# CONFIG_CPU_IDLE is not set' >> $KERN_CONFIG_FILE
 #	# To allow userspace(root) access all of memory.
 #	echo '# CONFIG_STRICT_DEVMEM is not set' >> $KERN_CONFIG_FILE
+#	echo "CONFIG_XILINX_APF=y" >> $KERN_CONFIG_FILE
+#	echo "CONFIG_STAGING=y" >> $KERN_CONFIG_FILE
+#	echo "CONFIG_XILINX_DMA_APF=y" >> $KERN_CONFIG_FILE
 #}
 
 # The first argument is the rootfs configure file

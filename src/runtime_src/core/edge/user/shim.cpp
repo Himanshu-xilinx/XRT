@@ -268,7 +268,17 @@ unsigned int ZYNQShim::xclAllocBO(size_t size, int unused, unsigned flags) {
 
 unsigned int ZYNQShim::xclAllocUserPtrBO(void *userptr, size_t size, unsigned flags) {
     (void)flags;
-    drm_zocl_userptr_bo info = {reinterpret_cast<uint64_t>(userptr), size, 0xffffffff, DRM_ZOCL_BO_FLAGS_USERPTR};
+    std::lock_guard<std::mutex> l(mBOMapLock);
+    //for (auto itr = mBoMap.begin(); itr != mBoMap.end(); ++itr) { 
+    //    printf("%s:%d  f[%x] s[%u]\n",__func__,__LINE__,itr->first,itr->second);
+    //}
+    auto it = mBoMap.find(reinterpret_cast<uint64_t>(userptr));
+    if (it == mBoMap.end()) {
+        std::cout  << "xclAllocUserPtrBO Bad Host PTR" << std::endl;
+        return -EINVAL;
+    }
+
+    drm_zocl_userptr_bo info = {it->second.paddr, size, 0xffffffff, DRM_ZOCL_BO_FLAGS_USERPTR};
     int result = ioctl(mKernelFD, DRM_IOCTL_ZOCL_USERPTR_BO, &info);
     if (mVerbosity == XCL_INFO) {
         std::cout  << "xclAllocUserPtrBO result = " << result << std::endl;

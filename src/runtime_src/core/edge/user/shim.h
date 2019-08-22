@@ -31,6 +31,13 @@
 #include "core/common/bo_cache.h"
 #include "core/common/xrt_profiling.h"
 
+struct BOData {
+    unsigned int boHandle;
+    uint64_t paddr;
+    size_t size;
+  };
+extern __attribute__((weak)) std::mutex mBOMapLock;
+extern __attribute__((weak)) std::map<uint64_t, BOData> mBoMap;
 namespace ZYNQ {
 
 // Forward declaration

@@ -41,6 +41,9 @@ TEMPLATE=zynqMP
 #	# *** Enable or disable Linux kernel features as you need ***
 #	# AR# 69143 -- To avoid PetaLinux hang when JTAG connected.
 #	echo '# CONFIG_CPU_IDLE is not set' >> $KERN_CONFIG_FILE
+#	echo "CONFIG_XILINX_APF=y" >> $KERN_CONFIG_FILE
+#	echo "CONFIG_STAGING=y" >> $KERN_CONFIG_FILE
+#	echo "CONFIG_XILINX_DMA_APF=y" >> $KERN_CONFIG_FILE
 #}
 
 # The first argument is the rootfs configure file
