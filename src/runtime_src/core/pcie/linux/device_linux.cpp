@@ -66,6 +66,34 @@ struct sysfs_fcn
       throw std::runtime_error(err);
     return value;
   }
+
+  static ValueType
+  get(const pdev& dev, const char* subdev, const char* entry, const boost::any& v)
+  {
+    std::string err;
+    ValueType value;
+    std::pair <const char*,const char*> p = boost::any_cast<std::pair <const char*,const char*>>(v);
+    if (!strcmp(p.first,"subdev"))
+      subdev = p.second;
+    else if (!strcmp(p.first,"entry"))
+      entry = p.second;
+    dev->sysfs_get(subdev, entry, err, value, static_cast<ValueType>(-1));
+    if (!err.empty())
+      throw std::runtime_error(err);
+    return value;
+  }
+
+  static ValueType
+  put(const pdev& dev, const char* subdev, const char* entry, const boost::any& v)
+  {
+    std::string err;
+    ValueType value;
+    value = boost::any_cast<ValueType>(v);
+    dev->sysfs_put(subdev, entry, err, value);
+    if (!err.empty())
+      throw std::runtime_error(err);
+    return value;
+  }
 };
 
 template <>
@@ -79,6 +107,34 @@ struct sysfs_fcn<std::string>
     std::string err;
     ValueType value;
     dev->sysfs_get(subdev, entry, err, value);
+    if (!err.empty())
+      throw std::runtime_error(err);
+    return value;
+  }
+
+  static ValueType
+  get(const pdev& dev, const char* subdev, const char* entry, const boost::any& v)
+  {
+    std::string err;
+    ValueType value;
+    std::pair <const char*,const char*> p = boost::any_cast<std::pair <const char*,const char*>>(v);
+    if (!strcmp(p.first,"subdev"))
+      subdev = p.second;
+    else if (!strcmp(p.first,"entry"))
+      entry = p.second;
+    dev->sysfs_get(subdev, entry, err, value);
+    if (!err.empty())
+      throw std::runtime_error(err);
+    return value;
+  }
+
+  static ValueType
+  put(const pdev& dev, const char* subdev, const char* entry, const boost::any& v)
+  {
+    std::string err;
+    ValueType value;
+    value = boost::any_cast<ValueType>(v);
+    dev->sysfs_put(subdev, entry, err, value);
     if (!err.empty())
       throw std::runtime_error(err);
     return value;
@@ -101,6 +157,35 @@ struct sysfs_fcn<std::vector<VectorValueType>>
       throw std::runtime_error(err);
     return value;
   }
+
+  static ValueType
+  get(const pdev& dev, const char* subdev, const char* entry, const boost::any& v)
+  {
+    std::string err;
+    ValueType value;
+    std::pair <const char*,const char*> p = boost::any_cast<std::pair <const char*,const char*>>(v);
+    if (!strcmp(p.first,"subdev"))
+      subdev = p.second;
+    else if (!strcmp(p.first,"entry"))
+      entry = p.second;
+    dev->sysfs_get(subdev, entry, err, value);
+    if (!err.empty())
+      throw std::runtime_error(err);
+    return value;
+  }
+
+  static ValueType
+  put(const pdev& dev, const char* subdev, const char* entry, const boost::any& v)
+  {
+    std::string err;
+    ValueType value;
+    std::string value1;
+    value1 = boost::any_cast<std::string>(v);
+    dev->sysfs_put(subdev, entry, err, value1);
+    if (!err.empty())
+      throw std::runtime_error(err);
+    return value;
+  }
 };
 
 template <typename QueryRequestType>
@@ -118,6 +203,20 @@ struct sysfs_getter : QueryRequestType
   {
     return sysfs_fcn<typename QueryRequestType::result_type>
       ::get(get_pcidev(device), subdev, entry);
+  }
+
+  boost::any
+  get(const xrt_core::device* device, const boost::any& v) const
+  {
+    return sysfs_fcn<typename QueryRequestType::result_type>
+      ::get(get_pcidev(device), subdev, entry, v);
+  }
+
+  boost::any
+  put(const xrt_core::device* device, const boost::any& v) const
+  {
+    return sysfs_fcn<typename QueryRequestType::result_type>
+      ::put(get_pcidev(device), subdev, entry, v);
   }
 };
 
@@ -170,11 +269,17 @@ initialize_query_table()
   emplace_sysfs_request<query::rom_uuid>                    ("rom", "uuid");
   emplace_sysfs_request<query::rom_time_since_epoch>        ("rom", "timestamp");
   emplace_sysfs_request<query::xclbin_uuid>                 ("", "xclbinuuid");
-  emplace_sysfs_request<query::mem_topology_raw>            ("icap", "mem_topology");
+  emplace_sysfs_request<query::memstat>                     ("", "memstat");
+  emplace_sysfs_request<query::memstat_raw>                 ("", "memstat_raw");
+  emplace_sysfs_request<query::mem_topology>                ("icap", "mem_topology");
+  emplace_sysfs_request<query::mem_topology_raw>            ("icap", "mem_topology_raw");
+  emplace_sysfs_request<query::dma_stream>                  ("dma", "");
+  emplace_sysfs_request<query::group_topology>              ("icap", "group_topology");
   emplace_sysfs_request<query::ip_layout_raw>               ("icap", "ip_layout");
   emplace_sysfs_request<query::clock_freqs_mhz>             ("icap", "clock_freqs");
   emplace_sysfs_request<query::idcode>                      ("icap", "idcode");
   emplace_sysfs_request<query::status_mig_calibrated>       ("", "mig_calibration");
+  emplace_sysfs_request<query::mig_cache_update>            ("", "mig_cache_update");
   emplace_sysfs_request<query::xmc_version>                 ("xmc", "version");
   emplace_sysfs_request<query::xmc_board_name>              ("xmc", "bd_name");
   emplace_sysfs_request<query::xmc_serial_num>              ("xmc", "serial_num");
@@ -185,6 +290,7 @@ initialize_query_table()
   emplace_sysfs_request<query::xmc_reg_base>                ("xmc", "reg_base");
   emplace_sysfs_request<query::dna_serial_num>              ("dna", "dna");
   emplace_sysfs_request<query::status_p2p_enabled>          ("", "p2p_enable");
+  emplace_sysfs_request<query::temp_by_mem_topology>        ("xmc", "temp_by_mem_topology");
   emplace_sysfs_request<query::temp_card_top_front>         ("xmc", "xmc_se98_temp0");
   emplace_sysfs_request<query::temp_card_top_rear>          ("xmc", "xmc_se98_temp1");
   emplace_sysfs_request<query::temp_card_bottom_front>      ("xmc", "xmc_se98_temp2");
@@ -246,12 +352,12 @@ initialize_query_table()
 
   emplace_sysfs_request<query::power_microwatts>          ("xmc", "xmc_power");
 
-  //emplace_sysfs_request<query::mig_ecc_enabled,         sp::_4, "ecc_enabled");
-  //emplace_sysfs_request<query::mig_ecc_status,          sp::_4, "ecc_status");
-  //emplace_sysfs_request<query::mig_ecc_ce_cnt,          sp::_4, "ecc_ce_cnt");
-  //emplace_sysfs_request<query::mig_ecc_ue_cnt,          sp::_4, "ecc_ue_cnt");
-  //emplace_sysfs_request<query::mig_ecc_ce_ffa,          sp::_4, "ecc_ce_ffa");
-  //emplace_sysfs_request<query::mig_ecc_ue_ffa,          sp::_4, "ecc_ue_ffa");
+  emplace_sysfs_request<query::mig_ecc_enabled>           ("mig", "ecc_enabled");
+  emplace_sysfs_request<query::mig_ecc_status>            ("mig", "ecc_status");
+  emplace_sysfs_request<query::mig_ecc_ce_cnt>            ("mig", "ecc_ce_cnt");
+  emplace_sysfs_request<query::mig_ecc_ue_cnt>            ("mig", "ecc_ue_cnt");
+  emplace_sysfs_request<query::mig_ecc_ce_ffa>            ("mig", "ecc_ce_ffa");
+  emplace_sysfs_request<query::mig_ecc_ue_ffa>            ("mig", "ecc_ue_ffa");
 
   emplace_sysfs_request<query::flash_bar_offset>          ("flash", "bar_off");
   emplace_sysfs_request<query::is_mfg>                    ("", "mfg");

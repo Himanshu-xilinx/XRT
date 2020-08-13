@@ -66,8 +66,14 @@ enum class key_type
   rom_time_since_epoch,
 
   xclbin_uuid,
+  mem_topology,
+  group_topology,
+  memstat,
+  memstat_raw,
+  temp_by_mem_topology,
   mem_topology_raw,
   ip_layout_raw,
+  dma_stream,
 
   xmc_version,
   xmc_board_name,
@@ -149,6 +155,7 @@ enum class key_type
   firewall_time_sec,
   power_microwatts,
 
+  mig_cache_update,
   mig_ecc_enabled,
   mig_ecc_status,
   mig_ecc_ce_cnt,
@@ -523,6 +530,63 @@ struct xclbin_uuid : request
 
   virtual boost::any
   get(const device*) const = 0;
+};
+
+struct group_topology : request
+{
+  using result_type = std::vector<char>;
+  static const key_type key = key_type::group_topology;
+
+  virtual boost::any
+  get(const device*) const = 0;
+};
+
+struct mem_topology : request
+{
+  using result_type = std::vector<char>;
+  static const key_type key = key_type::mem_topology;
+
+  virtual boost::any
+  get(const device*) const = 0;
+};
+
+struct temp_by_mem_topology : request
+{
+  using result_type = std::vector<char>;
+  static const key_type key = key_type::temp_by_mem_topology;
+
+  virtual boost::any
+  get(const device*) const = 0;
+};
+
+struct memstat : request
+{
+  using result_type = std::vector<char>;
+  static const key_type key = key_type::memstat;
+
+  virtual boost::any
+  get(const device*) const = 0;
+};
+
+struct memstat_raw : request
+{
+  using result_type = std::vector<std::string>;
+  static const key_type key = key_type::memstat_raw;
+
+  virtual boost::any
+  get(const device*) const = 0;
+};
+
+struct dma_stream : request
+{
+  using result_type = std::vector<std::string>;
+  static const key_type key = key_type::dma_stream;
+
+  virtual boost::any
+  get(const device*) const = 0;
+
+  virtual boost::any
+  get(const device*, const boost::any&) const = 0;
 };
 
 struct mem_topology_raw : request
@@ -1534,6 +1598,18 @@ struct power_microwatts : request
   {
     return std::to_string(value);
   }
+};
+
+struct mig_cache_update : request
+{
+  using result_type = std::string;
+  static const key_type key = key_type::mig_cache_update;
+
+  virtual boost::any
+  get(const device*, const boost::any&) const = 0;
+
+  virtual void
+  put(const device*, const boost::any&) const = 0;
 };
 
 struct mig_ecc_enabled : request
