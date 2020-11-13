@@ -109,7 +109,7 @@ namespace xdp {
         for (auto& gmio : xrt_core::edge::aie::get_trace_gmios(device.get())) {
           (db->getStaticInfo()).addTraceGMIO(deviceId, gmio.id, gmio.shim_col, gmio.channel_number, gmio.stream_id, gmio.burst_len) ;
         }
-      }
+      } 
       (db->getStaticInfo()).setIsGMIORead(deviceId, true);
     }
 #endif

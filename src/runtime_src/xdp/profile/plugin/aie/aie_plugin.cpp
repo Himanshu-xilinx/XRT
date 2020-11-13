@@ -139,7 +139,7 @@ namespace xdp {
       auto counters = xrt_core::edge::aie::get_profile_counters(device.get());
       if (xrt_core::config::get_aie_profile() && counters.empty()) {
         std::string msg("AIE Profile Counters are not found in AIE metadata of the given design. So, AIE Profile information will not be available.");
-        xrt_core::message::send(xrt_core::message::severity_level::warning, "XRT", msg) ;			  
+        xrt_core::message::send(xrt_core::message::severity_level::XRT_WARNING, "XRT", msg) ;
       }
       for (auto& counter : counters) {
         (db->getStaticInfo()).addAIECounter(deviceId, counter.id, counter.column,

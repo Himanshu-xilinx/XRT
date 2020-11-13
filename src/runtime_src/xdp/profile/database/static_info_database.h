@@ -298,28 +298,28 @@ namespace xdp {
     bool isAIECounterRead(uint64_t deviceId)
     {
       if(deviceInfo.find(deviceId) == deviceInfo.end())
-        return false; 
+        return false;
       return deviceInfo[deviceId]->isAIEcounterRead;
     }
 
     void setIsAIECounterRead(uint64_t deviceId, bool val)
     {
       if(deviceInfo.find(deviceId) == deviceInfo.end())
-        return; 
+        return;
       deviceInfo[deviceId]->isAIEcounterRead = val;
     }
 
     void setIsGMIORead(uint64_t deviceId, bool val)
     {
       if(deviceInfo.find(deviceId) == deviceInfo.end())
-        return; 
+        return;
       deviceInfo[deviceId]->isGMIORead = val;
     }
 
     bool isGMIORead(uint64_t deviceId)
     {
       if(deviceInfo.find(deviceId) == deviceInfo.end())
-        return false; 
+        return false;
       return deviceInfo[deviceId]->isGMIORead;
     }
 
